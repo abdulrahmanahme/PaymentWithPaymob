@@ -1,4 +1,4 @@
 
 class AppText{
-  static String payMentIntegration='PayMent Integration';
+  static String payMentIntegration='Payment Integration';
 }
