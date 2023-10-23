@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:payment/modules/register_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:payment/modules/payment/cubit/bloc_observer/bloc_observer.dart';
+import 'package:payment/modules/register_screen/register_screen.dart';
+import 'package:payment/shared/network/dio_helper.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+ await DioHelperPayment.initial();
+ Bloc.observer = MyBlocObserver();
   runApp(const MyApp());
 }
 
