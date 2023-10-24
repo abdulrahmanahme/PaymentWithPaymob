@@ -7,10 +7,10 @@ static  String orderId='';
 static  String finalTokenCard='';
 static  String finalTokenKiosk='';
 
-static  String intgrationIdCard='';
-static  String intgrationIdKiosk='';
+static  String integrationIdCard='4294042';
+static  String integrationIdKiosk='';
 
- String refCode='';
+static  String refCode='';
 
 
 

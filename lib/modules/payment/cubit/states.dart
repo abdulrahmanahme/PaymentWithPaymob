@@ -20,8 +20,28 @@ class SuccessOrderIdState extends PaymentStates{}
 class ErrorOrderIdState extends PaymentStates{
   String error;
   ErrorOrderIdState({required this.error});
-
 }
+
+////////////  request token 
+class LoadingRequestTokenState extends PaymentStates{}
+
+class SuccessRequestTokenState extends PaymentStates{}
+
+class ErrorRequestTokenState extends PaymentStates{
+  String error;
+  ErrorRequestTokenState({required this.error});
+}
+
+////////////  Kiosk
+class LoadingKioskState extends PaymentStates{}
+
+class SuccessKioskState extends PaymentStates{}
+
+class ErrorKioskState extends PaymentStates{
+  String error;
+  ErrorKioskState({required this.error});
+}
+
 
 
 

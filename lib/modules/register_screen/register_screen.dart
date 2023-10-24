@@ -37,7 +37,11 @@ class RegisterScreen extends StatelessWidget {
         body: Padding(
           padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 15.w),
           child: BlocConsumer<PaymentCubit, PaymentStates>(
-              listener: (context, state) {},
+              listener: (context, state) {
+                // if(state is ErrorRequestTokenState){
+                //   print('from sreen ${state.error}');
+                // }
+              },
               builder: (context, state) {
                 return Form(
                   key: formKey,
@@ -117,9 +121,21 @@ class RegisterScreen extends StatelessWidget {
                             : DefaultButton(
                                 buttonText: 'Pay Now',
                                 function: () {
-                                  if (formKey.currentState!.validate()) {
-                                    context.read<PaymentCubit>().getFistToken();
-                                  }
+                                  // if (formKey.currentState!.validate()) {
+                                  //   context.read<PaymentCubit>().getFistToken(
+                                  //       firstName: firstNameController.text,
+                                  //       lastName: lastNameController.text,
+                                  //       email: emailNameController.text,
+                                  //       phone: phoneNameController.text,
+                                  //       price: priceNameController.text);
+                                  // }
+
+                                  context.read<PaymentCubit>().getFistToken(
+                                        firstName: 'ABDO',
+                                        lastName: 'ahmed',
+                                        email: 'abdoahmed@gmail.com',
+                                        phone: '01010973536',
+                                        price: '5952277');
                                 },
                               ),
                       ],
