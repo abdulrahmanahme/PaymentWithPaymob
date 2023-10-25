@@ -1,33 +1,22 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:payment/modules/payment/cubit/states.dart';
-import '../../../shared/components/constant.dart';
-import '../../../shared/network/dio_helper.dart';
+import 'package:payment/modules/cubit/states.dart';
+import '../../shared/components/constant.dart';
+import '../../shared/network/dio_helper.dart';
 
 class PaymentCubit extends Cubit<PaymentStates> {
   PaymentCubit() : super(InitialState());
   static PaymentCubit get(context) => BlocProvider.of(context);
 
-  Future getFistToken({
-    required String firstName,
-    required String lastName,
-    required String email,
-    required String phone,
-    required String price,
-  }) async {
+  Future getFistToken(
+   
+  ) async {
     emit(LoadingPaymentState());
     try {
       var response = await DioHelperPayment.postData(
-          url: 'auth/tokens', data: {"api_key": AppConst.paymobApikey});
+          url: AppConst.getAuthToken, data: {"api_key": AppConst.paymobApikey});
       AppConst.paymobFirstToken = response.data["token"].toString();
-      getOrderId(price: price);
-      requestToken(
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          phone: phone,
-          price: price);
-      getKiosk();
+      print('first ${AppConst.paymobFirstToken}');
+     
       emit(SuccessPaymentState());
     } catch (e) {
       print('error$e');
@@ -36,29 +25,48 @@ class PaymentCubit extends Cubit<PaymentStates> {
   }
 
   Future getOrderId({
+     required String firstName,
+    required String lastName,
+    required String email,
+    required String phone,
     required String price,
   }) async {
     emit(LoadingOrderIdState());
+
+    DioHelperPayment.postData(url: AppConst.getOrderId, data: {
+      "auth_token": AppConst.paymobFirstToken,
+      "delivery_needed": "false",
+      "amount_cents": price,
+      "currency": "EGP",
+      "items": [],
+    }).then((value) {
+      // AppConst.orderId = response.data['id'];
+      print('Order Id1:${value.data}');
+requestToken(firstName: firstName,lastName: lastName,email: email,phone: phone,price: price);
+      emit(SuccessOrderIdState());
+    }).catchError((e) {
+      emit(ErrorOrderIdState(error: e.toString()));
+      print('error$e');
+    });
+  }
+
+
+   Future getKiosk() async {
+    emit(LoadingKioskState());
     try {
       var response =
-          await DioHelperPayment.postData(url: 'ecommerce/orders', data: {
-        "auth_token": AppConst.paymobFirstToken,
-        "delivery_needed": "false",
-        "amount_cents": price,
-        "currency": "EGP",
-        "items": [],
+          await DioHelperPayment.postData(url: AppConst.getRefCode, data: {
+        "source": {"identifier": "AGGREGATOR", "subtype": "AGGREGATOR"},
+        "payment_token": AppConst.finalTokenCard
       });
-
-      AppConst.orderId = response.data['id'];
-
-      print('Order Id1:${AppConst.orderId}');
-
-      emit(SuccessOrderIdState());
+      AppConst.refCode = response.data['id'].toString();
+      emit(SuccessKioskState());
     } catch (e) {
-      emit(ErrorOrderIdState(error: e.toString()));
+      emit(ErrorKioskState(error: e.toString()));
       print('error$e');
     }
   }
+
 
   Future requestToken({
     required String firstName,
@@ -69,11 +77,11 @@ class PaymentCubit extends Cubit<PaymentStates> {
   }) async {
     emit(LoadingRequestTokenState());
 
-    DioHelperPayment.postData(url: 'acceptance/payment_keys', data: {
+    DioHelperPayment.postData(url: AppConst.getPaymentRequest, data: {
       "auth_token": AppConst.paymobFirstToken,
       "amount_cents": price,
       "expiration": 36050,
-      "order_id": AppConst.orderId,
+      "order_id": 159620414,
       "billing_data": {
         "apartment": "NA",
         "email": email,
@@ -95,7 +103,8 @@ class PaymentCubit extends Cubit<PaymentStates> {
     }).then((value) {
       AppConst.finalTokenCard = value.data["token"].toString();
       print('Request Token :${AppConst.finalTokenCard}');
-
+ 
+      
       emit(SuccessRequestTokenState());
     }).catchError((e) {
       print('error is : $e');
@@ -103,20 +112,5 @@ class PaymentCubit extends Cubit<PaymentStates> {
     });
   }
 
-  Future getKiosk() async {
-    emit(LoadingKioskState());
-    try {
-      var response = await DioHelperPayment.postData(
-          url: 'acceptance/payments/pay',
-          data: {
-            "source": {"identifier": "AGGREGATOR", "subtype": "AGGREGATOR"},
-            "payment_token": AppConst.finalTokenCard
-          });
-      AppConst.refCode = response.data['id'].toString();
-      emit(SuccessKioskState());
-    } catch (e) {
-      emit(ErrorKioskState(error: e.toString()));
-      print('error$e');
-    }
-  }
+ 
 }

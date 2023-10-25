@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 
+import '../components/constant.dart';
+
 class DioHelperPayment {
   static late Dio dio;
   static  initial() {
     dio = Dio(
       BaseOptions(
-          baseUrl: 'https://accept.paymob.com/api/',
+          baseUrl:AppConst.baseUrl,
           receiveDataWhenStatusError: true,
           headers: {'Content-Type': 'application/json'}),
     );
